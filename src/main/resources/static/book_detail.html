@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书籍详情 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1>书籍详情</h1>
+        <nav>
+            <ul>
+                <li><a href="/user_dashboard.html">我的主页</a></li>
+                <li><a href="/book_list.html">浏览书籍</a></li>
+                <li><a href="/user_borrows.html">我的借阅</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="book-detail" id="bookDetailContainer">
+        <!-- 动态加载书籍详情 -->
+        <p>加载中...</p>
+    </section>
+
+    <section class="related-books">
+        <h2>相关书籍</h2>
+        <div class="book-card-list">
+            <!-- 示例相关书籍卡片，实际可以根据书籍分类或标签从后端获取 -->
+            <div class="book-card">
+                <img src="https://via.placeholder.com/100x150?text=Related+Book+1" alt="书籍封面">
+                <h3><a href="#">相关书籍 1</a></h3>
+                <p>作者：相关作者 1</p>
+            </div>
+            <div class="book-card">
+                <img src="https://via.placeholder.com/100x150?text=Related+Book+2" alt="书籍封面">
+                <h3><a href="#">相关书籍 2</a></h3>
+                <p>作者：相关作者 2</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+</body>
+</html>

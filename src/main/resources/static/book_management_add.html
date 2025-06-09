@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加/编辑书籍 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1>书籍管理</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin_dashboard.html">主页</a></li>
+                <li><a href="/user_management.html">用户管理</a></li>
+                <li><a href="/book_list.html">书籍管理</a></li>
+                <li><a href="/borrow_management.html">借阅管理</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="book-form-section">
+        <h2 id="formTitle">添加新书</h2>
+        <form id="bookForm">
+            <input type="hidden" id="bookId" name="id"> <!-- 用于编辑时存储书籍ID -->
+            <div class="form-group">
+                <label for="title">书名:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">作者:</label>
+                <input type="text" id="author" name="author">
+            </div>
+            <div class="form-group">
+                <label for="isbn">ISBN:</label>
+                <input type="text" id="isbn" name="isbn">
+            </div>
+            <div class="form-group">
+                <label for="publisher">出版社:</label>
+                <input type="text" id="publisher" name="publisher">
+            </div>
+            <div class="form-group">
+                <label for="publicationDate">出版日期:</label>
+                <input type="date" id="publicationDate" name="publicationDate">
+            </div>
+            <div class="form-group">
+                <label for="category">分类:</label>
+                <input type="text" id="category" name="category">
+            </div>
+            <div class="form-group">
+                <label for="description">简介:</label>
+                <textarea id="description" name="description" rows="5"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="totalCopies">总副本数:</label>
+                <input type="number" id="totalCopies" name="totalCopies" min="0" required>
+            </div>
+            <div class="form-group" id="availableCopiesGroup" style="display: none;">
+                <label for="availableCopies">可借阅副本数:</label>
+                <input type="number" id="availableCopies" name="availableCopies" min="0">
+            </div>
+            <button type="submit" class="btn-add" id="submitBtn">添加书籍</button>
+        </form>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2023 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
+        const formTitle = document.getElementById('formTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const bookForm = document.getElementById('bookForm');
+        const availableCopiesGroup = document.getElementById('availableCopiesGroup');
+
+        if (bookId) {
+            formTitle.textContent = '编辑书籍';
+            submitBtn.textContent = '更新书籍';
+            availableCopiesGroup.style.display = 'block'; // 编辑时显示可借阅数
+
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/books/${bookId}`);
+                if (response.ok) {
+                    const book = await response.json();
+                    document.getElementById('bookId').value = book.id;
+                    document.getElementById('title').value = book.title;
+                    document.getElementById('author').value = book.author;
+                    document.getElementById('isbn').value = book.isbn;
+                    document.getElementById('publisher').value = book.publisher;
+                    document.getElementById('publicationDate').value = book.publicationDate;
+                    document.getElementById('category').value = book.category;
+                    document.getElementById('description').value = book.description;
+                    document.getElementById('totalCopies').value = book.totalCopies;
+                    document.getElementById('availableCopies').value = book.availableCopies;
+                } else {
+                    alert('加载书籍信息失败。');
+                }
+            } catch (error) {
+                console.error('加载书籍信息错误:', error);
+                alert('加载书籍信息时发生错误。');
+            }
+        }
+
+        bookForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(bookForm);
+            const bookData = {};
+            formData.forEach((value, key) => {
+                bookData[key] = value;
+            });
+
+            const method = bookId ? 'PUT' : 'POST';
+            const url = bookId ? `${API_BASE_URL}/admin/books/${bookId}` : `${API_BASE_URL}/admin/books`;
+
+            try {
+                const response = await authenticatedFetch(url, {
+                    method: method,
+                    body: JSON.stringify(bookData)
+                });
+
+                if (response.ok) {
+                    alert(bookId ? '书籍更新成功！' : '书籍添加成功！');
+                    window.location.href = '/book_list.html'; // 跳转回书籍列表页
+                } else {
+                    const errorText = await response.text();
+                    alert(`${bookId ? '书籍更新' : '书籍添加'}失败: ${errorText}`);
+                }
+            } catch (error) {
+                console.error(`${bookId ? '更新' : '添加'}书籍失败:`, error);
+                alert(`${bookId ? '更新' : '添加'}书籍时发生网络错误或服务器无响应。`);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1>用户管理</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin_dashboard.html">主页</a></li>
+                <li><a href="/user_management.html">用户管理</a></li>
+                <li><a href="/book_list.html">书籍管理</a></li>
+                <li><a href="/borrow_management.html">借阅管理</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="user-management-actions">
+        <button class="btn-add" onclick="addUser()">添加新用户</button> <!-- 调用JS函数 -->
+        <form id="userSearchForm" class="search-bar"> <!-- 添加ID -->
+            <input type="text" name="query" placeholder="搜索用户名或ID">
+            <button type="submit">搜索</button>
+        </form>
+    </section>
+
+    <section class="user-list">
+        <table>
+            <thead>
+            <tr>
+                <th>用户ID</th>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>电话</th>
+                <th>角色</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody">
+            <!-- 动态加载用户数据 -->
+            <tr><td colspan="7">加载中...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="pagination" id="userPaginationContainer">
+        <!-- 动态加载分页 -->
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+</body>
+</html>

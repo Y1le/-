@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员主页 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1>管理员面板</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin_dashboard.html">主页</a></li>
+                <li><a href="/user_management.html">用户管理</a></li>
+                <li><a href="/book_list.html">书籍管理</a></li> <!-- 管理员也可以用这个页面查看书籍 -->
+                <li><a href="/borrow_management.html">借阅管理</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="admin-overview">
+        <h2>系统概览</h2>
+        <div class="stats-grid" id="statsGrid">
+            <!-- 动态加载内容 -->
+            <p>加载中...</p>
+        </div>
+    </section>
+
+    <section class="quick-actions">
+        <h2>快速操作</h2>
+        <div class="action-buttons">
+            <a href="/book_management_add.html" class="btn-action">添加新书</a> <!-- 新增书籍添加页面 -->
+            <button class="btn-action" onclick="addUser()">添加新用户</button> <!-- 调用JS函数 -->
+            <a href="/borrow_management.html?status=OVERDUE" class="btn-action">查看逾期借阅</a>
+            <a href="/borrow_management.html?status=PENDING" class="btn-action">查看待处理请求</a>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+</body>
+</html>

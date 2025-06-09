@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书籍列表 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1>书籍列表</h1>
+        <nav>
+            <ul>
+                <li><a href="/user_dashboard.html">我的主页</a></li>
+                <li><a href="/book_list.html">浏览书籍</a></li>
+                <li><a href="/user_borrows.html">我的借阅</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="book-filter-search">
+        <form id="bookSearchForm" class="search-bar"> <!-- 添加ID -->
+            <input type="text" name="query" placeholder="搜索书名、作者或ISBN" id="searchQueryInput">
+            <button type="submit">搜索</button>
+        </form>
+        <div class="filter-options">
+            <label for="category-filter">分类:</label>
+            <select id="category-filter" name="category">
+                <option value="">所有分类</option>
+                <option value="编程">编程</option>
+                <option value="文学">文学</option>
+                <option value="历史">历史</option>
+                <!-- 更多分类，可以动态加载 -->
+            </select>
+            <label for="available-filter">状态:</label>
+            <select id="available-filter" name="available">
+                <option value="">所有</option>
+                <option value="true">可借阅</option>
+                <option value="false">已借出</option>
+            </select>
+            <button type="button" id="filterBtn" class="btn">筛选</button>
+            <!-- 管理员添加书籍按钮 -->
+            <button type="button" class="btn-add" id="addBookBtn" style="display:none;" onclick="location.href='/book_management_add.html'">添加新书</button>
+        </div>
+    </section>
+
+    <section class="book-list">
+        <div class="book-item-grid" id="bookListContainer">
+            <!-- 动态加载书籍项 -->
+            <p>加载中...</p>
+        </div>
+    </section>
+
+    <div class="pagination" id="paginationContainer">
+        <!-- 动态加载分页 -->
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+<script>
+    // book_list.html 页面特有的逻辑
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentUser = JSON.parse(localStorage.getItem('current_user'));
+        const addBookBtn = document.getElementById('addBookBtn');
+        if (currentUser && currentUser.role === 'ROLE_ADMIN') {
+            addBookBtn.style.display = 'inline-block'; // 显示添加书籍按钮
+        }
+
+        // 从URL获取搜索参数，用于初始化搜索框
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+        if (query) {
+            document.getElementById('searchQueryInput').value = query;
+        }
+    });
+
+    // 管理员删除书籍
+    async function deleteBook(bookId) {
+        if (confirm('确定要删除此书籍吗？此操作不可逆！')) {
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/admin/books/${bookId}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('书籍删除成功！');
+                    window.location.reload(); // 刷新页面
+                } else {
+                    const errorText = await response.text();
+                    alert(`书籍删除失败: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('删除书籍失败:', error);
+                alert('删除书籍时发生错误。');
+            }
+        }
+    }
+
+    // 管理员编辑书籍
+    function editBook(bookId) {
+        window.location.href = `/book_management_add.html?id=${bookId}`;
+    }
+</script>
+</body>
+</html>

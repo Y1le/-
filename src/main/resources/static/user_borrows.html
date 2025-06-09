@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的借阅 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1 id="usernameDisplayMyBorrows">我的借阅</h1>
+        <nav>
+            <ul>
+                <li><a href="/user_dashboard.html">我的主页</a></li>
+                <li><a href="/book_list.html">浏览书籍</a></li>
+                <li><a href="/user_borrows.html">我的借阅</a></li>
+                <li><a href="#" id="logoutBtn">退出登录</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="borrow-filter-search">
+        <div class="filter-options">
+            <label for="borrowStatusFilter">状态:</label>
+            <select id="borrowStatusFilter" name="status">
+                <option value="">所有</option>
+                <option value="BORROWED">借阅中</option>
+                <option value="RETURNED">已归还</option>
+                <option value="OVERDUE">已逾期</option>
+                <option value="PENDING">待审批</option>
+            </select>
+            <button type="button" id="borrowFilterBtn" class="btn">筛选</button>
+        </div>
+    </section>
+
+    <section class="borrow-list">
+        <table>
+            <thead>
+            <tr>
+                <th>借阅ID</th>
+                <th>书籍ID</th> <!-- 实际应显示书籍名称 -->
+                <th>借阅日期</th>
+                <th>应归还日期</th>
+                <th>实际归还日期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="userBorrowTableBody">
+            <!-- 动态加载内容 -->
+            <tr><td colspan="7">加载中...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="pagination" id="userBorrowPaginationContainer">
+        <!-- 动态加载分页 -->
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2023 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+<script>
+    // 专门为 user_borrows.html 页面添加加载逻辑
+    document.addEventListener('DOMContentLoaded', () => {
+        const userBorrowTableBody = document.getElementById('userBorrowTableBody');
+        const borrowStatusFilter = document.getElementById('borrowStatusFilter');
+        const borrowFilterBtn = document.getElementById('borrowFilterBtn');
+        const userBorrowPaginationContainer = document.getElementById('userBorrowPaginationContainer');
+        const usernameDisplayMyBorrows = document.getElementById('usernameDisplayMyBorrows');
+
+        const currentUser = JSON.parse(localStorage.getItem('current_user'));
+        if (usernameDisplayMyBorrows && currentUser) {
+            usernameDisplayMyBorrows.textContent = `${currentUser.username} 的借阅`;
+        }
+
+        let currentPage = 1;
+        let currentStatusFilter = '';
+
+        async function fetchUserBorrowRecords(page = 1, status = '') {
+            let url = `${API_BASE_URL}/borrows/my?page=${page}&size=10`;
+            if (status) url += `&status=${encodeURIComponent(status)}`;
+
+            try {
+                const response = await authenticatedFetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderUserBorrowTable(data.records);
+                    renderUserBorrowPagination(data.current, data.pages);
+                } else {
+                    userBorrowTableBody.innerHTML = '<tr><td colspan="7">加载借阅记录失败。</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error fetching user borrow records:', error);
+                userBorrowTableBody.innerHTML = '<tr><td colspan="7">加载借阅记录时发生错误。</td></tr>';
+            }
+        }
+
+        async function renderUserBorrowTable(records) {
+            userBorrowTableBody.innerHTML = '';
+            if (records && records.length > 0) {
+                for (const record of records) {
+                    // 获取书籍名称
+                    let bookTitle = '未知书籍';
+                    try {
+                        const bookResponse = await authenticatedFetch(`${API_BASE_URL}/books/${record.bookId}`);
+                        if (bookResponse.ok) {
+                            const book = await bookResponse.json();
+                            bookTitle = book.title;
+                        }
+                    } catch (e) {
+                        console.error('Failed to fetch book title for record:', record.bookId, e);
+                    }
+
+                    const borrowDate = new Date(record.borrowDate).toLocaleDateString();
+                    const dueDate = new Date(record.dueDate).toLocaleDateString();
+                    const returnDate = record.returnDate ? new Date(record.returnDate).toLocaleDateString() : 'N/A';
+                    const statusClass = `status-${record.status.toLowerCase()}`;
+
+                    const row = `
+                            <tr>
+                                <td>${record.id}</td>
+                                <td><a href="/book_detail.html?id=${record.bookId}">${bookTitle}</a></td>
+                                <td>${borrowDate}</td>
+                                <td>${dueDate}</td>
+                                <td>${returnDate}</td>
+                                <td class="${statusClass}">${record.status}</td>
+                                <td class="table-actions">
+                                    ${record.status === 'BORROWED' ? `<button class="btn-action" onclick="returnBookByUser(${record.id})">归还</button>` : ''}
+                                    ${record.status === 'BORROWED' && new Date(record.dueDate) > new Date() ? `<button class="btn-action" onclick="renewBookByUser(${record.id})">续借</button>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    userBorrowTableBody.insertAdjacentHTML('beforeend', row);
+                }
+            } else {
+                userBorrowTableBody.innerHTML = '<tr><td colspan="7">您还没有借阅记录。</td></tr>';
+            }
+        }
+
+        function renderUserBorrowPagination(currentPage, totalPages) {
+            userBorrowPaginationContainer.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const createPageLink = (page, text, isActive = false, isDisabled = false) => {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = text;
+                if (isActive) link.classList.add('active');
+                if (isDisabled) link.classList.add('disabled');
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!isDisabled && !isActive) {
+                        fetchUserBorrowRecords(page, currentStatusFilter);
+                    }
+                });
+                return link;
+            };
+
+            userBorrowPaginationContainer.appendChild(createPageLink(currentPage - 1, '&laquo; 上一页', false, currentPage === 1));
+            for (let i = 1; i <= totalPages; i++) {
+                userBorrowPaginationContainer.appendChild(createPageLink(i, i, i === currentPage));
+            }
+            userBorrowPaginationContainer.appendChild(createPageLink(currentPage + 1, '下一页 &raquo;', false, currentPage === totalPages));
+        }
+
+        if (borrowFilterBtn) {
+            borrowFilterBtn.addEventListener('click', () => {
+                currentStatusFilter = borrowStatusFilter.value;
+                currentPage = 1;
+                fetchUserBorrowRecords(currentPage, currentStatusFilter);
+            });
+        }
+
+        fetchUserBorrowRecords(currentPage, currentStatusFilter);
+    });
+
+    // 用户归还书籍
+    async function returnBookByUser(recordId) {
+        if (confirm('确定要归还此书籍吗？')) {
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/borrows/${recordId}/return`, {
+                    method: 'PUT'
+                });
+                if (response.ok) {
+                    alert('书籍归还成功！');
+                    window.location.reload();
+                } else {
+                    const errorText = await response.text();
+                    alert(`归还失败: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('归还请求失败:', error);
+                alert('归还时发生网络错误或服务器无响应。');
+            }
+        }
+    }
+
+    // 用户续借书籍
+    async function renewBookByUser(recordId) {
+        if (confirm('确定要续借此书籍吗？')) {
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/borrows/${recordId}/renew`, {
+                    method: 'PUT'
+                });
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(`续借成功！${message}`); // 后端返回新的归还日期
+                    window.location.reload();
+                } else {
+                    const errorText = await response.text();
+                    alert(`续借失败: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('续借请求失败:', error);
+                alert('续借时发生网络错误或服务器无响应。');
+            }
+        }
+    }
+</script>
+</body>
+</html>

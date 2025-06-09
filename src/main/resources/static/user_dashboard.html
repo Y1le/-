@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户主页 - 图书馆管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <h1 id="usernameDisplayDashboard">欢迎!</h1> <!-- 添加ID -->
+        <nav>
+            <ul>
+                <li><a href="/user_dashboard.html">我的主页</a></li>
+                <li><a href="/book_list.html">浏览书籍</a></li>
+                <li><a href="/user_borrows.html">我的借阅</a></li> <!-- 新增用户借阅页面 -->
+                <li><a href="/index.html" id="logoutBtn">退出登录</a></li> <!-- 添加ID -->
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container content">
+    <section class="search-section">
+        <h2>查找书籍</h2>
+        <form action="/book_list.html" method="get"> <!-- 提交到书籍列表页，带查询参数 -->
+            <input type="text" name="query" placeholder="输入书名、作者或ISBN">
+            <button type="submit">搜索</button>
+        </form>
+    </section>
+
+    <section class="recent-borrows">
+        <h2>最近借阅</h2>
+        <div class="book-card-list" id="recentBorrowsContainer">
+            <!-- 动态加载内容 -->
+            <p>加载中...</p>
+        </div>
+        <p><a href="/user_borrows.html">查看所有借阅记录 &raquo;</a></p>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 图书馆管理系统</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h2>Welcome, <span th:text="${username}"></span>!</h2>
+    <p>You have successfully logged in.</p>
+
+    <!-- 获取当前登录用户信息的另一种方式 (使用 Thymeleaf Spring Security Extra) -->
+    <p>Your username (from SecurityContextHolder): <span sec:authentication="name"></span></p>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Logout</button>
+    </form>
+</div>
+</body>
+</html>

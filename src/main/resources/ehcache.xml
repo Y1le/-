@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <diskStore path="java.io.tmpdir/cache"/>
+    <!--
+    默认缓存模板配置
+    作用：所有未单独配置的缓存会继承这些默认参数
+    -->
+    <!--
+     maxElementsInMemory：内存中最大缓存对象数量（单位：个）
+     eternal：是否永久有效（true=永不过期，false=需配合TTL/TTI设置）
+     timeToIdleSeconds：对象空闲时间（未访问超过此时长则清除）
+     timeToLiveSeconds：对象总存活时间（从创建开始计算）
+     overflowToDisk：内存不足时是否溢出到磁盘（true=允许溢出）
+     diskPersistent：是否持久化磁盘数据（true=重启后保留数据）
+     diskExpiryThreadIntervalSeconds：磁盘过期检查线程运行间隔（单位：秒）
+   -->
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="300"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"    />
+    <!--
+      自定义缓存实例配置，覆盖默认配置
+    -->
+    <cache name="book"
+           maxEntriesLocalHeap="1000"
+           timeToLiveSeconds="30000"/>
+</ehcache>

@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shangke?useSSL=false&serverTimezone=UTC
+    username: root
+    password: "@Aa123456"
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
+app:
+  jwtSecret: YourSuperSecretKeyForJWTGenerationAndValidationWhichShouldBeAtLeast32BytesLong
+  jwtExpirationMs: 86400000 # 24 hours in milliseconds (24 * 60 * 60 * 1000)
+logging:
+  level:
+    root: INFO
+    com.example.demo.controller: INFO # 替换为你的控制器实际包名
