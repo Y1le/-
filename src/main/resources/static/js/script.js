@@ -225,3 +225,42 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchBooks(currentPage, currentQuery, currentCategory, currentAvailability);
     }
 });
+
+async function borrowBook(bookId) {
+    const currentUser = JSON.parse(localStorage.getItem('current_user'));
+    if (!currentUser) {
+        alert('请先登录才能借阅书籍！');
+        window.location.href = '/index.html';
+        return;
+    }
+
+    if (confirm('确定要借阅此书籍吗？')) {
+        try {
+            // 发送 POST 请求到后端 /borrows 接口
+            const response = await authenticatedFetch(`${API_BASE_URL}/borrows`, {
+                method: 'POST',
+                body: JSON.stringify({ bookId: bookId }) // 只需传递 bookId
+            });
+
+            if (response.ok) {
+                const message = await response.text(); // 假设后端返回String，如 "书籍借阅成功！"
+                alert(message);
+                // 借阅成功后，刷新书籍列表以更新书籍状态和可借阅数量
+                window.location.reload(); // 简单粗暴的刷新
+                // 或者更优雅地只更新当前书籍的状态
+                // fetchBooks(currentPage, currentQuery, currentCategory, currentAvailability); // 重新加载当前页书籍
+            } else {
+                const errorText = await response.text(); // 获取后端返回的错误信息
+                alert(`借阅失败: ${errorText}`);
+            }
+        } catch (error) {
+            console.error('借阅请求失败:', error);
+            if (error instanceof AuthError) {
+                console.warn('认证错误，已重定向到登录页。');
+                // AuthError 已经在 authenticatedFetch 内部处理了 alert 和重定向
+            } else {
+                alert('借阅时发生网络错误或服务器无响应。');
+            }
+        }
+    }
+}
