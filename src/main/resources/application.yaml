@@ -7,13 +7,18 @@ spring:
     username: root
     password: "@Aa123456"
   cache:
-    type: ehcache
-    ehcache:
-      config: classpath:ehcache.xml
+    type: redis # 将缓存类型设置为 redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
 app:
   jwtSecret: YourSuperSecretKeyForJWTGenerationAndValidationWhichShouldBeAtLeast32BytesLong
   jwtExpirationMs: 86400000 # 24 hours in milliseconds (24 * 60 * 60 * 1000)
 logging:
   level:
     root: INFO
-    com.example.demo.controller: INFO # 替换为你的控制器实际包名
+#    org.springframework.cache: TRACE          # 缓存抽象层
+#    org.springframework.data.redis: TRACE     # Redis数据访问层
+#    org.springframework.aop: TRACE            # AOP代理层
+#    com.mydemo: DEBUG
