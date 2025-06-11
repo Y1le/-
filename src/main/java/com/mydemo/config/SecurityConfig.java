@@ -62,37 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 其他所有请求都需要认证
                 .anyRequest().authenticated();
 
-        // 移除 formLogin() 配置，让 AuthController 接管 /auth/login
-        /*
-        .and()
-        .formLogin()
-            .loginPage("/index.html")
-            .loginProcessingUrl("/auth/login")
-            .successHandler(customAuthenticationSuccessHandler())
-            .failureUrl("/index.html?error")
-            .permitAll()
-        .and()
-        .logout()
-            .logoutUrl("/logout")
-            .logoutSuccessHandler(customLogoutSuccessHandler())
-            .permitAll();
-        */
-
         // 添加 JWT 过滤器，在 UsernamePasswordAuthenticationFilter 之前执行
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    // 移除 customAuthenticationSuccessHandler() 和 customLogoutSuccessHandler() Bean
-    // 因为不再使用 formLogin() 来处理重定向
-    /*
-    @Bean
-    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        // ...
-    }
 
-    @Bean
-    public LogoutSuccessHandler customLogoutSuccessHandler() {
-        // ...
-    }
-    */
 }

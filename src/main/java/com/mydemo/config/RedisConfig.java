@@ -1,11 +1,5 @@
 package com.mydemo.config;
 
-// import com.fasterxml.jackson.annotation.JsonAutoDetect; // 不再需要
-// import com.fasterxml.jackson.annotation.PropertyAccessor; // 不再需要
-// import com.fasterxml.jackson.databind.ObjectMapper; // 不再需要
-// import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator; // 不再需要
-// import com.fasterxml.jackson.annotation.JsonTypeInfo; // 不再需要
-
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

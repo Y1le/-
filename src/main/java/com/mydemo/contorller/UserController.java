@@ -22,8 +22,6 @@ public class UserController {
     public User getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) { // <-- 将 User 改为 UserDetails
         if (userDetails == null) {
             System.out.println("Current authenticated user (via System.out.println): null (UserDetails is null)");
-            // 理论上，如果JWT过滤器成功设置了Authentication，userDetails不会是null
-            // 但如果真的为null，这里可以返回一个错误响应或null
             return null;
         }
 
